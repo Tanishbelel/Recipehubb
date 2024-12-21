@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome to RecipeHub - Share & Discover Recipes{% endblock %}
+
+{% block start %}
+<!-- Hero Section -->
+<div class="hero-section position-relative mb-5">
+    <div class="container py-5">
+        <div class="row align-items-center min-vh-75">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">Discover & Share Your Favorite Recipes</h1>
+                <p class="lead text-muted mb-4">Join our community of food lovers to discover, share, and save delicious recipes from around the world.</p>
+                {% if not request.user.is_authenticated %}
+                    <div class="d-flex gap-3">
+                        <a href="{% url 'login' %}" class="btn btn-primary btn-lg px-4">Get Started</a>
+                        <a href="{% url 'register' %}" class="btn btn-outline-primary btn-lg px-4">Sign Up</a>
+                    </div>
+                {% else %}
+                    <a href="{% url 'recipes' %}" class="btn btn-primary btn-lg px-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg me-2" viewBox="0 0 16 16">
+                            <path d="M8 0a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2H9v6a1 1 0 1 1-2 0V9H1a1 1 0 0 1 0-2h6V1a1 1 0 0 1 1-1z"/>
+                        </svg>
+                        Share Your Recipe
+                    </a>
+                {% endif %}
+            </div>
+            <div class="col-lg-6 d-none d-lg-block">
+               
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Featured Recipes Section -->
+<div class="container mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0">Featured Recipes</h2>
+        <a href="{% url 'recipes' %}" class="btn btn-outline-primary">View All Recipes</a>
+    </div>
+    
+    <div class="row g-4">
+        {% for recipe in featured_recipes %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm">
+                {% if recipe.recipe_image %}
+                    <img src="/media/{{recipe.recipe_image}}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{recipe.recipe_name}}">
+                {% else %}
+                    <div class="bg-light text-center py-5">
+                            <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                            <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13zm13 1a.5.5 0 0 1 .5.5v6l-3.775-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12v.54A.505.505 0 0 1 1 12.5v-9a.5.5 0 0 1 .5-.5h13z"/>
+                        </svg>
+                    </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-2">{{recipe.recipe_name}}</h5>
+                    <p class="card-text text-muted">{{recipe.recipe_des|truncatechars:100}}</p>
+                </div>
+                <div class="card-footer bg-white border-top-0 d-flex justify-content-between align-items-center">
+                    <small class="text-muted">By {{recipe.user.username}}</small>
+                    <button class="btn btn-outline-danger btn-sm favs" data-recipe-id="{{recipe.id}}">
+                        {% if recipe in user_favorites %}❤️{% else %}♡{% endif %}
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Categories Section -->
+<div class="bg-light py-5 mb-5">
+    <div class="container">
+        <h2 class="fw-bold text-center mb-4">Browse by Category</h2>
+        <div class="row g-4 justify-content-center">
+            {% for category in categories %}
+            <div class="col-6 col-md-4 col-lg-3">
+                <a href="{% url 'category' category.slug %}" class="text-decoration-none">
+                    <div class="card h-100 border-0 shadow-sm category-card">
+                        <div class="card-body text-center">
+                            <img src="/media/{{category.icon}}" alt="{{category.name}}" class="mb-3" style="width: 48px; height: 48px;">
+                            <h5 class="card-title mb-0">{{category.name}}</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Join Community Section -->
+<div class="container mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+            <h2 class="fw-bold mb-4">Join Our Community</h2>
+            <p class="lead text-muted mb-4">Connect with fellow food lovers, share your culinary creations, and discover new recipes every day.</p>
+            {% if not request.user.is_authenticated %}
+                <a href="{% url 'register' %}" class="btn btn-primary btn-lg px-4">Sign Up Now</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Hero Section */
+    .hero-section {
+        background-color: #f8f9fa;
+    }
+    
+    /* Card Styling */
+    .card {
+        border-radius: 15px;
+        transition: transform 0.2s;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .category-card:hover {
+        background-color: #f8f9fa;
+    }
+    
+    /* Button Styling */
+    .btn-primary {
+        background-color: #0d6efd;
+        border: none;
+        transition: all 0.2s;
+    }
+    
+    .btn-primary:hover {
+        background-color: #0b5ed7;
+        transform: translateY(-1px);
+    }
+    
+    .btn-outline-primary {
+        border-width: 2px;
+        transition: all 0.2s;
+    }
+    
+    .btn-outline-primary:hover {
+        transform: translateY(-1px);
+    }
+    
+    /* Favorite Button */
+    .btn-outline-danger.favs {
+        transition: all 0.2s;
+    }
+    
+    .btn-outline-danger.favs:hover {
+        transform: scale(1.1);
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .display-4 {
+            font-size: 2.5rem;
+        }
+        
+        .lead {
+            font-size: 1.1rem;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const favButtons = document.querySelectorAll('.favs');
+    
+    favButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const recipeId = this.dataset.recipeId;
+            
+            fetch(`/toggle-favorite/${recipeId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    this.innerHTML = data.is_favorite ? '❤️' : '♡';
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block start %}
+<style>
+    /* Update Recipe Form Styles */
+    .update-recipe-form {
+        background-color: #f8f9fa; /* Light background color */
+        border-radius: 8px; /* Rounded corners */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        max-width: 600px; /* Limiting form width */
+        margin: 0 auto; /* Centering the form */
+        padding: 30px; /* Spacing inside the form */
+    }
+
+    .update-recipe-form h2 {
+        font-family: 'Roboto', sans-serif; /* Elegant font */
+        font-weight: 600; /* Bold title */
+        color: #343a40; /* Dark text color */
+    }
+
+    .form-group label {
+        font-weight: 500; /* Slightly bold label */
+        color: #495057; /* Darker text for labels */
+    }
+
+    .form-control {
+        border-radius: 6px; /* Slightly rounded edges */
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1); /* Soft inner shadow */
+        transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions */
+    }
+
+    .form-control:focus {
+        border-color: #28a745; /* Green border on focus */
+        box-shadow: 0 0 8px rgba(40, 167, 69, 0.2); /* Light green shadow on focus */
+    }
+
+    .btn {
+        font-size: 16px; /* Button font size */
+        font-weight: 600; /* Bold button text */
+        padding: 12px; /* Button padding */
+        border-radius: 6px; /* Rounded button */
+        border: none;
+    }
+
+    .btn-success {
+        background-color: #28a745; /* Green button color */
+        color: white; /* White text */
+    }
+
+    .btn-success:hover {
+        background-color: #218838; /* Darker green on hover */
+        border-color: #1e7e34; /* Darker green border */
+    }
+</style>
+
+<div class="container mt-5">
+    <form method="post" enctype="multipart/form-data" class="update-recipe-form p-4">
+        {% csrf_token %}
+        <h2 class="text-center mb-4">Update Recipe</h2>
+
+        <div class="form-group mb-4">
+            <label for="recipe_name" class="form-label">Recipe Name</label>
+            <input type="text" name="recipe_name" value="{{ recipes.recipe_name }}" class="form-control" required>
+        </div>
+
+        <div class="form-group mb-4">
+            <label for="recipe_des" class="form-label">Recipe Description</label>
+            <textarea name="recipe_des" class="form-control" rows="4" required>{{ recipes.recipe_des }}</textarea>
+        </div>
+
+        <div class="form-group mb-4">
+            <label for="recipe_image" class="form-label">Recipe Image</label>
+            <input type="file" name="recipe_image" class="form-control">
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Update Recipe</button>
+    </form>
+</div>
+{% endblock %}

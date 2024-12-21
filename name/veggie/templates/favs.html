@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block title %}My Favorites - RecipeHub{% endblock %}
+
+{% block start %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">My Favorite Recipes</h2>
+                <a href="{% url 'home' %}" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left"></i> Back to Recipes
+                </a>
+            </div>
+            
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th scope="col" class="px-4">#</th>
+                                <th scope="col">Recipe Name</th>
+                                <th scope="col">Recipe Description</th>
+                                <th scope="col">Recipe Image</th>
+                                <th scope="col" class="text-end px-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for recipe in recipes %}
+                            <tr>
+                                <th scope="row" class="px-4">{{forloop.counter}}</th>
+                                <td class="fw-semibold">{{recipe.recipe_name}}</td>
+                                <td class="text-muted">{{recipe.recipe_des|truncatechars:100}}</td>
+                                <td>
+                                    {% if recipe.recipe_image %}
+                                        <img src="/media/{{recipe.recipe_image}}" class="rounded" style="height: 80px; width: 80px; object-fit: cover;">
+                                    {% else %}
+                                        <span class="badge bg-light text-dark">No image</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end px-4">
+                                    <a href="/update/{{recipe.id}}/" class="btn btn-outline-primary btn-sm me-2">View Recipe</a>
+                                    <button class="btn btn-outline-danger btn-sm favs" data-recipe-id="{{recipe.id}}">❤️</button>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4">
+                                    <div class="text-muted">
+                                        <i class="bi bi-heart" style="font-size: 2rem;"></i>
+                                        <p class="mt-2 mb-0">No favorite recipes yet</p>
+                                        <a href="{% url 'home' %}" class="btn btn-primary mt-3">Browse Recipes</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 15px;
+    }
+    
+    .table td, .table th {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+    
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .btn-outline-danger.favs {
+        transition: all 0.2s;
+    }
+    
+    .btn-outline-danger.favs:hover {
+        transform: scale(1.1);
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const favButtons = document.querySelectorAll('.favs');
+    
+    favButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const recipeId = this.dataset.recipeId;
+            
+            fetch(`/toggle-favorite/${recipeId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success' && !data.is_favorite) {
+                    // If removed from favorites, remove the row from the table
+                    const row = this.closest('tr');
+                    row.remove();
+                    
+                    // Check if there are any rows left
+                    const tbody = document.querySelector('tbody');
+                    if (!tbody.querySelector('tr:not(.empty-row)')) {
+                        location.reload(); // Reload to show empty state
+                    }
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
+{% endblock %}
